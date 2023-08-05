@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "caentools"
+dependencies = [
+    "scipp",
+    "numpy",
+    "importlib_metadata; python_version<'3.8'",
+]
+dyanmic = ["version"]
+
+[project.scripts]
+caen-extract = 'caentools.commands:extract'
+
+[tool.setuptools_scm]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["caentools*"]
