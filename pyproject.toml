@@ -9,7 +9,7 @@ dependencies = [
     "numpy",
     "importlib_metadata; python_version<'3.8'",
 ]
-dyanmic = ["version"]
+dynamic = ["version"]
 
 [project.scripts]
 caen-extract = 'caentools.commands:extract'
