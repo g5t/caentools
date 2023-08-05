@@ -27,7 +27,7 @@ def parse_extract():
     parser.add_argument('filename', type=readable, help='The filename to extract from')
     parser.add_argument('-c', '--channels', type=numbers, default=range(15),
                         help='The zero-based channel indexes to extract, e.g., 0-5 or 4,3,8,9')
-    parser.add_argument('-o', type=str, default=None, help='The output file prefix')
+    parser.add_argument('-o', '--output', type=str, default=None, help='The output file prefix')
 
     args = parser.parse_args()
     return args
