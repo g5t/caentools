@@ -8,11 +8,12 @@ dependencies = [
     "scipp",
     "numpy",
     "importlib_metadata; python_version<'3.8'",
+    "typer[all]"
 ]
 dynamic = ["version"]
 
 [project.scripts]
-caen-extract = 'caentools.commands:extract'
+caen-extract = 'caentools.main:cli_extract'
 
 [tool.setuptools_scm]
 
