@@ -37,7 +37,7 @@ def read_scipp(filename, clock=None, sort=True, channel=None):
     ampl_a = array(values=1.0 * dat['amplitude_a'].astype('int'), dims=['event'], unit='mV')
     ampl_b = array(values=1.0 * dat['amplitude_b'].astype('int'), dims=['event'], unit='mV')
     
-    if channel:
+    if channel is not None:
         keep = chan == channel
         chan, ampl_a, ampl_b, time = [da[keep] for da in (chan, ampl_a, ampl_b, time)]
     
