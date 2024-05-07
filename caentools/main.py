@@ -22,7 +22,7 @@ def parse_numbers(arg: str):
 
 
 def extract(filename: Path,
-            channels: Annotated[Numbers, typer.Argument(parser=parse_numbers)] = '0-14',
+            channels: Annotated[Numbers, typer.Argument(parser=parse_numbers)] = '0-15',
             output: Annotated[Path, typer.Option(help='Output, calling directory if None')] = None):
     """
     Extract the comma separated list, dash separated range, or individual channel index(es)
@@ -37,7 +37,7 @@ def extract(filename: Path,
     if output.is_dir():
         base = filename.stem
     else:
-        base = output.parts[-1]  # everything following the last directory delimeter
+        base = output.parts[-1]  # everything following the last directory delimiter
         output = output.parent
 
     for index in channels:
