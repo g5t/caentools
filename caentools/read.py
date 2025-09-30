@@ -29,7 +29,7 @@ def read_scipp(filename, clock=None, sort=True, channel=None):
 
     dat = read_dat(filename)
     # concatenate the two 32-bit time-words, divide by the clock frequency to get seconds
-    time = array(values=(dat['time_high'] * 2**32 + dat['time_low']) / clock,
+    time = array(values=(dat['time_high'].astype('int') * 2**32 + dat['time_low'].astype('int')) / clock,
                  dims=['event'], unit='sec')
     chan = array(values=dat['tube_channel'].astype('int'), dims=['event'])
     ampl_a = array(values=1.0 * dat['amplitude_a'].astype('int'), dims=['event'], unit='mV')
