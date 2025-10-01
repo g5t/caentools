@@ -2,6 +2,7 @@ import typer
 from pathlib import Path
 from typing_extensions import Annotated
 from dataclasses import dataclass, field
+from datetime import datetime
 
 
 @dataclass
@@ -23,7 +24,9 @@ def parse_numbers(arg: str):
 
 def extract(filename: Path,
             channels: Annotated[Numbers, typer.Argument(parser=parse_numbers)] = '0-15',
-            output: Annotated[Path, typer.Option(help='Output, calling directory if None')] = None):
+            output: Annotated[Path, typer.Option(help='Output, calling directory if None')] = None,
+            datatype: Annotated[datetime, typer.Option(help='Message data type timepoint, latest if None')] = None
+            ):
     """
     Extract the comma separated list, dash separated range, or individual channel index(es)
     from the input CAEN '.dat' filename.
@@ -41,7 +44,7 @@ def extract(filename: Path,
         output = output.parent
 
     for index in channels:
-        channel = filter_events(filename, index)
+        channel = filter_events(filename, index, pivot=datatype)
         file_path = output.joinpath(f'{base}_channel_{index:02d}.txt')
         with file_path.open('w') as file:
             a_array, b_array, x_array = [channel.coords[n].values for n in ('amplitude_a', 'amplitude_b', 'x')]

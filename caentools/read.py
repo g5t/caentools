@@ -1,37 +1,51 @@
-def read_dat(filename):
-    """Read packed binary data of the form used for BIFROST detector tests
+from datetime import datetime
+
+
+def datatype(pivot: datetime | None = None):
+    from numpy import uint32, uint16, uint8
+    if pivot is None:
+        pivot = datetime.now()
+    if not isinstance(pivot, datetime):
+        raise ValueError("Input should be a valid datetime")
+    # only two (known) formats for CAEN firmware, with minor differences
+    dtype = [('time_high', uint32), ('time_low', uint32)]
+
+    if pivot.year < 2024 or (pivot.year == 2024 and pivot.month <= 9):
+        dtype.extend([('unused_16', uint16), ('group', uint8), ('id_flags', uint8)])
+    else:
+        dtype.extend([('flags_om', uint8), ('group', uint8), ('unused_16', uint16)])
     
-    Actually-found layout from LLB detector tests
-    struct raw_data_t {
-      uint32_t TimeHi;
-      uint32_t TimeLo;
-      uint16_t unused16;
-      uint8_t TubeCh;
-      uint8_t IDnFlags;
-      uint16_t AmplA;
-      uint16_t AmplB;
-      uint32_t unused32;
-    } __attribute__((__packed__));
-    """
-    from numpy import fromfile, uint32, uint16, uint8
-    dtype = [('time_high', uint32), ('time_low', uint32),
-             ('unused_16', uint16), ('tube_channel', uint8),
-             ('id_flags', uint8),
-             ('amplitude_a', uint16), ('amplitude_b', uint16),
-             ('unused_32', uint32)]
+    for x in ('a', 'b', 'c', 'd'):
+        dtype.append((f'amplitude_{x}', 'uint16'))
+
+    return dtype
+
+
+def file_creation_datetime(filename):
+    import os
+    try:
+        return datetime.fromtimestamp(os.path.getctime(filename))
+    except Exception as ex:
+        return None
+
+
+def read_dat(filename, pivot: datetime | None = None):
+    """Read packed binary data from CAEN instrumetns"""
+    from numpy import fromfile
+    dtype = datatype(file_creation_datetime(filename) if pivot is None else pivot)
     return fromfile(filename, dtype=dtype)
 
 
-def read_scipp(filename, clock=None, sort=True, channel=None):
+def read_scipp(filename, clock=None, sort=True, channel=None, pivot: datetime | None = None):
     from scipp import array, DataArray, ones_like
     if clock is None:
         clock = 1.25e8  # 125 MHz CPU clock, 25 MHz internal clock oscillator
 
-    dat = read_dat(filename)
+    dat = read_dat(filename, pivot=pivot)
     # concatenate the two 32-bit time-words, divide by the clock frequency to get seconds
     time = array(values=(dat['time_high'].astype('int') * 2**32 + dat['time_low'].astype('int')) / clock,
                  dims=['event'], unit='sec')
-    chan = array(values=dat['tube_channel'].astype('int'), dims=['event'])
+    chan = array(values=dat['group'].astype('int'), dims=['event'])
     ampl_a = array(values=1.0 * dat['amplitude_a'].astype('int'), dims=['event'], unit='mV')
     ampl_b = array(values=1.0 * dat['amplitude_b'].astype('int'), dims=['event'], unit='mV')
     
