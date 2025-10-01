@@ -1,21 +1,25 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "caentools"
 dependencies = [
     "scipp",
     "numpy",
-    "typer[all]"
+    "typer"
 ]
 dynamic = ["version"]
+description = ""
 
 [project.scripts]
 caen-extract = 'caentools.main:cli_extract'
 
-[tool.setuptools_scm]
-
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["caentools*"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch]
